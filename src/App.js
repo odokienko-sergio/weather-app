@@ -6,6 +6,28 @@ import axios from "axios";
 
 const key = "837705b1ff42a8546e87dcecda4b48e5";
 
+const parseWeekData = (data) => {
+    const filteredData = data.filter((item, index, array) => {
+        return array.findIndex((entry) => isSameDay(entry.dt_txt, item.dt_txt)) === index;
+    });
+
+    return filteredData.map((item) => ({
+        day: item.dt_txt,
+        temp: item.main.temp,
+        precipitation: item.weather[0].main,
+    }));
+};
+
+const isSameDay = (dateString1, dateString2) => {
+    const date1 = new Date(dateString1);
+    const date2 = new Date(dateString2);
+    return (
+        date1.getFullYear() === date2.getFullYear() &&
+        date1.getMonth() === date2.getMonth() &&
+        date1.getDate() === date2.getDate()
+    );
+};
+
 const App = () => {
   const [weather, setWeather] = useState({});
   const [weekData, setWeekData] = useState([]);
@@ -31,27 +53,7 @@ const App = () => {
     fetchWeatherData();
   }, []);
 
-  const parseWeekData = (data) => {
-    const filteredData = data.filter((item, index, array) => {
-      return array.findIndex((entry) => isSameDay(entry.dt_txt, item.dt_txt)) === index;
-    });
 
-    return filteredData.map((item) => ({
-      day: item.dt_txt,
-      temp: item.main.temp,
-      precipitation: item.weather[0].main,
-    }));
-  };
-
-  const isSameDay = (dateString1, dateString2) => {
-    const date1 = new Date(dateString1);
-    const date2 = new Date(dateString2);
-    return (
-        date1.getFullYear() === date2.getFullYear() &&
-        date1.getMonth() === date2.getMonth() &&
-        date1.getDate() === date2.getDate()
-    );
-  };
 
   const handleCityChange = (newCity) => {
     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${newCity}&appid=${key}`;
