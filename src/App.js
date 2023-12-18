@@ -14,7 +14,7 @@ const App = () => {
   useEffect(() => {
     // Fetch weather data for the user's current location when the component mounts
     fetchWeatherData();
-  }, []);
+  }, [fetchWeatherData]);
 
   const fetchWeatherData = () => {
     navigator.geolocation.getCurrentPosition((position) => {
