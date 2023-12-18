@@ -12,25 +12,24 @@ const App = () => {
   const [newCity, setNewCity] = useState("");
 
   useEffect(() => {
+    const fetchWeatherData = () => {
+          navigator.geolocation.getCurrentPosition((position) => {
+              const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=${key}`;
+              const weekApiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=${key}`;
+
+              axios.all([axios.get(apiUrl), axios.get(weekApiUrl)])
+                  .then(axios.spread((weatherRes, weekRes) => {
+                      setWeather(weatherRes.data);
+                      setWeekData(parseWeekData(weekRes.data.list));
+                  }))
+                  .catch((error) => {
+                      console.error("Error fetching data:", error);
+                  });
+          });
+      };
     // Fetch weather data for the user's current location when the component mounts
     fetchWeatherData();
-  }, [fetchWeatherData]);
-
-  const fetchWeatherData = () => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=${key}`;
-      const weekApiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=${key}`;
-
-      axios.all([axios.get(apiUrl), axios.get(weekApiUrl)])
-          .then(axios.spread((weatherRes, weekRes) => {
-            setWeather(weatherRes.data);
-            setWeekData(parseWeekData(weekRes.data.list));
-          }))
-          .catch((error) => {
-            console.error("Error fetching data:", error);
-          });
-    });
-  };
+  }, []);
 
   const parseWeekData = (data) => {
     const filteredData = data.filter((item, index, array) => {
